@@ -20,8 +20,8 @@ Usage: csvw-check [options]
 ### Docker
 
 ```bash
-$ docker pull gsscogs/csvw-check:latest
-$ docker run --rm gsscogs/csvw-check:latest bin/csvw-check -s https://w3c.github.io/csvw/tests/test011/tree-ops.csv-metadata.json
+$ docker pull roblinksdata/csvw-check:latest
+$ docker run --rm roblinksdata/csvw-check:latest -s https://w3c.github.io/csvw/tests/test011/tree-ops.csv-metadata.json
 Valid CSV-W
 ```
 
