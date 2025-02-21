@@ -27,7 +27,7 @@ Valid CSV-W
 
 ### Not Docker
 
-Acquire the latest universal 'binary' ZIP file from the releases tab (e.g. [csvw-check-0.0.3.zip](https://github.com/GSS-Cogs/csvw-check/releases/download/v0.0.3/csvw-check-0.0.3.zip)).
+Acquire the latest universal 'binary' ZIP file from the releases tab (e.g. [csvw-check-0.3.1.zip](https://github.com/roblinksdata/csvw-check/releases/download/v0.3.1/csvw-check-universal.zip)).
 
 ```bash
 $ bin/csvw-check -s https://w3c.github.io/csvw/tests/test011/tree-ops.csv-metadata.json
