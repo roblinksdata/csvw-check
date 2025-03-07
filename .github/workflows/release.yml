@@ -49,6 +49,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Submit SBT dependencies to the GitHub dependency graph.
+      - name: Sbt Dependency Submission
+        uses: scalacenter/sbt-dependency-submission@v3.1.0
+
       - name: Build Universal Artifact
         run: sbt Universal/packageBin
 
