@@ -104,8 +104,8 @@ object Main extends App {
         })
         .recover(e => {
           println(Console.RED + "")
-          println("Unhandled Exception")
-          println(e)
+          logger.error("Unhandled Exception")
+          logger.error(e.toString)
           print(Console.RESET + "")
           sys.exit(1)
         })
