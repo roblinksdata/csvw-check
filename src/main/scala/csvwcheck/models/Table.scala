@@ -307,6 +307,15 @@ case class Table private(
       ),
     NotUsed
   ] = {
+    // Configure the initial foreign key definitions for the case where the table has zero rows of data.
+    // Code reference d662ed3e-113d-11f0-9ba8-237e5819328e
+    val initialTableKeyValues = AccumulatedTableKeyValues(
+      mapForeignKeyDefinitionToKeys = this.schema
+        .map(s => s.foreignKeys.map((_, Set[KeyValueWithContext]())).toMap)
+        .getOrElse(Map()),
+      mapForeignKeyReferenceToKeys = this.foreignKeyReferences.map((_, Set[KeyValueWithContext]())).toMap
+    )
+
     Source
       .fromIterator(() => parser.asScala.iterator)
       .filter(row => row.getRecordNumber > dialect.skipRows)
@@ -325,7 +334,7 @@ case class Table private(
             .map(parseRow(_, dialect))
         }
       )
-      .fold(AccumulatedTableKeyValues()) {
+      .fold(initialTableKeyValues) {
         case (accumulatedTableKeyValues, rowOutputs) =>
           accumulateTableKeyValuesForRowGroup(
             accumulatedTableKeyValues,
