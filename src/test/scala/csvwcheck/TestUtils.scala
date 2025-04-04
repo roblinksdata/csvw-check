@@ -12,9 +12,16 @@ object TestUtils {
 
   def RunValidationInAkka(validator: Validator): WarningsAndErrors = {
     var warningsAndErrors = WarningsAndErrors()
+    var error: Option[Throwable] = None
+
     val akkaStream =
-      validator.validate().map(wAndE => warningsAndErrors = wAndE)
+      validator
+        .validate()
+        .map(wAndE => warningsAndErrors = wAndE)
+        .recover(err => error = Some(err))
     Await.ready(akkaStream.runWith(Sink.ignore), 10.hours)
+
+    error.foreach(e => throw e)
 
     warningsAndErrors
   }

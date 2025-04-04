@@ -186,7 +186,13 @@ case class Table private(
           degreeOfParallelism,
           rowGrouping,
           httpClient
-        ).recover {
+        )
+          .map({
+            // Now ensure that the warnings and errors know which CSV file this happened w.r.t.
+            case (wAndE, foreignKeyDefinitions, referencedTableForeignKeyDefinitions) =>
+              (specifyCsvTableInWarningsAndErrors(wAndE), foreignKeyDefinitions, referencedTableForeignKeyDefinitions)
+          })
+          .recover {
           case NonFatal(err) =>
             logger.debug(err)
             val warnings = Array(
@@ -307,6 +313,15 @@ case class Table private(
       ),
     NotUsed
   ] = {
+    // Configure the initial foreign key definitions for the case where the table has zero rows of data.
+    // Code reference d662ed3e-113d-11f0-9ba8-237e5819328e
+    val initialTableKeyValues = AccumulatedTableKeyValues(
+      mapForeignKeyDefinitionToKeys = this.schema
+        .map(s => s.foreignKeys.map((_, Set[KeyValueWithContext]())).toMap)
+        .getOrElse(Map()),
+      mapForeignKeyReferenceToKeys = this.foreignKeyReferences.map((_, Set[KeyValueWithContext]())).toMap
+    )
+
     Source
       .fromIterator(() => parser.asScala.iterator)
       .filter(row => row.getRecordNumber > dialect.skipRows)
@@ -325,7 +340,7 @@ case class Table private(
             .map(parseRow(_, dialect))
         }
       )
-      .fold(AccumulatedTableKeyValues()) {
+      .fold(initialTableKeyValues) {
         case (accumulatedTableKeyValues, rowOutputs) =>
           accumulateTableKeyValuesForRowGroup(
             accumulatedTableKeyValues,
@@ -350,6 +365,12 @@ case class Table private(
         )
       })
   }
+
+  private def specifyCsvTableInWarningsAndErrors(warningsAndErrors: WarningsAndErrors) =
+    warningsAndErrors.copy(
+      warnings = warningsAndErrors.warnings.map(w => w.copy(csvFilePath = Some(url))),
+      errors = warningsAndErrors.errors.map(e => e.copy(csvFilePath = Some(url)))
+    )
 
   private def getParser(
                          dialect: Dialect,

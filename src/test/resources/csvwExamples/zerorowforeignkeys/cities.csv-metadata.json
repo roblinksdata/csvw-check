@@ -1,0 +1,44 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "tables": [
+    {
+      "url": "cities.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "cityName",
+            "titles": "cityName"
+          },
+          {
+            "name": "countryCode",
+            "titles": "countryCode"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "columnReference": "countryCode",
+            "reference": {
+              "resource": "countries.csv",
+              "columnReference": "countryCode"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "url": "countries.csv",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "countryCode",
+            "titles": "countryCode"
+          },
+          {
+            "name": "name",
+            "titles": "name"
+          }
+        ]
+      }
+    }
+  ]
+}

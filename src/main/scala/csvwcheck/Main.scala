@@ -102,6 +102,13 @@ object Main extends App {
           println(Console.GREEN + "Valid CSV-W")
           print(Console.RESET + "")
         })
+        .recover(e => {
+          println(Console.RED + "")
+          logger.error("Unhandled Exception")
+          logger.error(e.toString)
+          print(Console.RESET + "")
+          sys.exit(1)
+        })
       Await.ready(akkaStream.runWith(Sink.ignore), Duration.Inf)
       actorSystem.terminate()
     case _ =>
